@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Run Windows npm from WSL (the app runs on Windows Node). Usage: bash scripts/npm-win run dev
+export PATH="/mnt/c/Program Files/nodejs:$PATH" WSLENV="PATH/l${WSLENV:+:$WSLENV}"
+exec "/mnt/c/Program Files/nodejs/node.exe" 'C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js' "$@"

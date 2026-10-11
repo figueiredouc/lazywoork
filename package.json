@@ -1,0 +1,30 @@
+{
+  "name": "agent-inbox",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Floating inbox for pending Claude Code agent requests",
+  "main": "out/main/index.js",
+  "scripts": {
+    "predev": "node -e \"process.platform==='win32'||(console.error('Corre com o Node do Windows: bash scripts/npm-win run dev (ou npm run dev numa PowerShell)'),process.exit(1))\"",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^44.6.0",
+    "electron-vite": "^5.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.7"
+  },
+  "dependencies": {
+    "@fontsource/figtree": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  }
+}

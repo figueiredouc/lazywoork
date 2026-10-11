@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<title>Agent Inbox — comando destrutivo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1A1A1A}
+button,textarea{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="width: 380px; height: 760px; box-sizing: border-box; background: #FFF8D6; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 4px 4px 0 #1A1A1A; overflow: hidden; display: flex; flex-direction: column; font-family: 'Figtree', system-ui, sans-serif; color: #1A1A1A">
+  <div style="display: flex; align-items: center; gap: 10px; padding: 14px 16px 12px 16px">
+    <a href="D-Lista.dc.html" style="height: 32px; padding: 0 12px 0 8px; border: 2px solid #1A1A1A; background: #FFFFFF; border-radius: 999px; display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; text-decoration: none; box-sizing: border-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+      Todos (2)
+    </a>
+    <div style="flex-grow: 1"></div>
+    <div style="font-size: 12px; font-weight: 700; color: #555048">1 de 2</div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #FF7A59; border-top: 2px solid #1A1A1A; border-bottom: 2px solid #1A1A1A; font-size: 14px; font-weight: 800">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"></path><path d="M12 10v5"></path><path d="M12 18v.5"></path></svg>
+    Calma aí: isto apaga ficheiros
+  </div>
+
+  <div style="flex-grow: 1; overflow: auto; padding: 14px 16px 16px 16px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <div style="width: 48px; height: 48px; border-radius: 14px; background: #FFD43B; border: 2px solid #1A1A1A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; flex-shrink: 0">DS</div>
+      <div style="display: flex; flex-direction: column; gap: 2px; flex-grow: 1">
+        <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.01em">docs-site</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #555048">chore/cleanup · separador 4 · há 3 s</div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="font-size: 12px; font-weight: 800; background: #FFD43B; border: 2px solid #1A1A1A; padding: 2px 10px; border-radius: 999px">quer correr</div>
+        <div style="font-size: 12px; font-weight: 700; color: #555048">Bash</div>
+      </div>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6; background: #1A1A1A; color: #FFF8D6; border-radius: 12px; padding: 11px 13px"><span style="background: #FF7A59; color: #1A1A1A; font-weight: 700; padding: 0 4px; border-radius: 4px">rm -rf</span> ./data/cache ./dist</div>
+      <div style="font-size: 13px; line-height: 1.45"><span style="font-weight: 800">Porquê:</span> limpar artefactos antigos antes do build.</div>
+    </div>
+
+    <div style="background: #FFFFFF; border: 2px solid #1A1A1A; border-radius: 16px; padding: 12px; display: flex; align-items: flex-start; gap: 10px">
+      <input id="conf" type="checkbox" style="width: 20px; height: 20px; margin: 1px 0 0 0; accent-color: #1A1A1A; flex-shrink: 0">
+      <label for="conf" style="font-size: 13px; line-height: 1.45; font-weight: 600">Li o comando e quero mesmo apagar estes ficheiros</label>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <button disabled style="min-height: 42px; padding: 8px 12px; border: 2px dashed #8A8473; border-radius: 14px; background: #F2EBC7; color: #6B6553; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 10px; text-align: left">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; width: 22px; height: 22px; border: 2px solid #8A8473; border-radius: 6px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0">1</span>
+        Sim, apagar
+      </button>
+      <button style="min-height: 42px; padding: 8px 12px; border: 2px solid #1A1A1A; border-radius: 14px; background: #1A1A1A; color: #FFF8D6; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 10px; text-align: left; box-shadow: 3px 3px 0 #FF7A59">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; width: 22px; height: 22px; border: 2px solid #FFF8D6; border-radius: 6px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0">2</span>
+        Não
+      </button>
+    </div>
+
+    <div style="background: #FFFFFF; border: 2px solid #1A1A1A; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+      <label for="msg" style="font-size: 13px; font-weight: 800">Ou diz-lhe outra coisa</label>
+      <textarea id="msg" rows="2" style="font-size: 13px; line-height: 1.45; border: 2px solid #1A1A1A; border-radius: 10px; padding: 8px 10px; resize: none; color: #1A1A1A; background: #FFF8D6">Apaga só a ./dist, a cache fica.</textarea>
+      <div style="display: flex; gap: 10px; align-items: center">
+        <button style="height: 36px; padding: 0 16px; border: 2px solid #1A1A1A; border-radius: 999px; background: #FFD43B; color: #1A1A1A; font-size: 13px; font-weight: 800">Enviar</button>
+        <div style="font-size: 12px; color: #555048">Sem «não voltar a perguntar» aqui.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":380,"height":760}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

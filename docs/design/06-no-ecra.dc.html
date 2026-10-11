@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<title>Agent Inbox — no ecrã com o iTerm2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1A1A1A}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; background: #CFCBBC; position: relative; overflow: hidden; font-family: 'Figtree', system-ui, sans-serif; color: #1A1A1A">
+
+  <div style="position: absolute; left: 48px; top: 56px; width: 860px; height: 680px; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; border: 4px solid #FFD43B; box-shadow: 0 0 0 4px #1A1A1A, 10px 10px 0 4px #1A1A1A; background: #1A1A1A">
+    <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #2B2B29">
+      <div style="width: 11px; height: 11px; border-radius: 50%; background: #5E5E59"></div>
+      <div style="width: 11px; height: 11px; border-radius: 50%; background: #5E5E59"></div>
+      <div style="width: 11px; height: 11px; border-radius: 50%; background: #5E5E59"></div>
+      <div style="flex-grow: 1; text-align: center; font-size: 12px; color: #BDBDB8">iTerm2</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #2B2B29">
+      <div style="padding: 9px 12px; font-size: 12px; color: #BDBDB8; border-right: 1px solid #3A3A37; font-family: 'JetBrains Mono', monospace">1 · api-gateway</div>
+      <div style="padding: 9px 12px; font-size: 12px; font-weight: 700; color: #1A1A1A; background: #FFD43B; display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace">
+        2 · ingest-worker
+        <div style="font-family: 'Figtree', sans-serif; font-size: 11px; font-weight: 800; background: #1A1A1A; color: #FFD43B; padding: 1px 8px; border-radius: 999px">aqui!</div>
+      </div>
+      <div style="padding: 9px 12px; font-size: 12px; color: #BDBDB8; border-right: 1px solid #3A3A37; font-family: 'JetBrains Mono', monospace">3 · web-dashboard</div>
+      <div style="padding: 9px 12px; font-size: 12px; color: #BDBDB8; font-family: 'JetBrains Mono', monospace">4 · docs-site</div>
+    </div>
+    <div style="flex-grow: 1; padding: 18px 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.75; color: #D6D6D1; white-space: pre-line; border-top: 3px solid #FFD43B">› Analisei o esquema atual da tabela de leituras.
+› Encontrei duas formas de migrar a tabela:
+  A) migração incremental com ALTER e backfill em lotes
+  B) recriar a tabela e reimportar os dados
+  Qual preferes?
+
+<span style="color: #FFD43B">&gt; █</span></div>
+  </div>
+
+  <div style="position: absolute; right: 40px; top: 56px; width: 300px; background: #FFF8D6; border: 2px solid #1A1A1A; border-radius: 20px; box-shadow: 4px 4px 0 #1A1A1A; overflow: hidden; display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; gap: 8px; padding: 12px 14px 4px 14px">
+      <div style="font-size: 17px; font-weight: 800; letter-spacing: -0.01em">2 à tua espera</div>
+    </div>
+    <div style="padding: 8px 14px 14px 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="background: #9EE6FF; border: 2px solid #1A1A1A; border-radius: 14px; padding: 10px; display: flex; align-items: center; gap: 10px; box-shadow: 3px 3px 0 #1A1A1A">
+        <div style="width: 30px; height: 30px; border-radius: 10px; background: #FFFFFF; border: 2px solid #1A1A1A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; flex-shrink: 0">IW</div>
+        <div style="display: flex; flex-direction: column; gap: 1px">
+          <div style="font-size: 14px; font-weight: 800">ingest-worker</div>
+          <div style="font-size: 12px; font-weight: 700">A mostrar no terminal…</div>
+        </div>
+      </div>
+      <div style="background: #FFFFFF; border: 2px solid #1A1A1A; border-radius: 14px; padding: 10px; display: flex; align-items: center; gap: 10px; box-shadow: 3px 3px 0 #1A1A1A">
+        <div style="width: 30px; height: 30px; border-radius: 10px; background: #FF8FAB; border: 2px solid #1A1A1A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; flex-shrink: 0">AG</div>
+        <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+          <div style="font-size: 14px; font-weight: 800">api-gateway</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #555048">npm run test</div>
+        </div>
+        <div style="flex-grow: 1"></div>
+        <div style="font-size: 11px; font-weight: 800; background: #FFD43B; border: 2px solid #1A1A1A; padding: 1px 8px; border-radius: 999px">quer correr</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: absolute; right: 40px; top: 330px; width: 300px; height: 404px; border: 2px dashed #6B6553; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #3A3A37; text-align: center; padding: 24px; box-sizing: border-box">[Outras janelas: editor, browser…]</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
