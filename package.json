@@ -10,7 +10,8 @@
     "build": "electron-vite build",
     "start": "electron-vite preview",
     "typecheck": "tsc --noEmit",
-    "dist:mac": "electron-vite build && electron-builder --mac"
+    "dist:mac": "electron-vite build && electron-builder --mac",
+    "screenshots": "electron-vite build && electron scripts/screenshots.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",
