@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http'
 import { readFile } from 'node:fs/promises'
 import { posix } from 'node:path'
-import { clearHighlight, focus, sendText } from './wezterm'
+import { clearHighlight, focus, sendText } from './terminal'
 import { findDestructive, type Agent, type InboxRequest, type InboxState, type PermissionOption, type Question, type QuestionAnswer, type QuestionRequest, type Reply } from '../shared/model'
 
 export const PORT = 41823
@@ -9,7 +9,7 @@ const MAX_BODY = 1024 * 1024
 const COLORS = ['#FF8FAB', '#9EE6FF', '#C7F59A', '#FFD43B']
 const COMMAND_KEYS = ['command', 'file_path', 'notebook_path', 'url', 'query', 'pattern']
 
-type Session = Agent & { socket: string; distro: string }
+type Session = Agent & { pane?: string; socket: string; distro: string; iterm?: string }
 /** A card plus, for PermissionRequest, the held HTTP response, what PostToolUse must match and the raw suggestions. */
 type Card = {
   req: InboxRequest
@@ -29,7 +29,7 @@ let onChange: (added: boolean) => void = () => {}
 
 export function getState(): InboxState {
   return {
-    agents: [...sessions.values()].map(({ socket: _s, distro: _d, ...agent }) => agent),
+    agents: [...sessions.values()].map(({ pane: _p, socket: _s, distro: _d, iterm: _i, ...agent }) => agent),
     requests: cards.map((c) => c.req)
   }
 }
@@ -40,6 +40,18 @@ export function dismiss(id: string): void {
 }
 
 export type { Reply }
+
+const MAX_NAME = 40
+
+/** User rename from the app: session-only. touch() never renames an existing session, so hooks can't overwrite it. */
+export function rename(agentId: string, name: unknown): boolean {
+  const session = sessions.get(agentId)
+  const clean = typeof name === 'string' ? name.replace(/\s+/g, ' ').trim().slice(0, MAX_NAME).trim() : ''
+  if (!session || !clean) return false
+  session.name = clean
+  onChange(false)
+  return true
+}
 
 const DENIED = 'The user denied this from Agent Inbox.'
 
@@ -63,14 +75,14 @@ export async function answer(id: string, reply: Reply): Promise<boolean> {
   return true
 }
 
-/** Free-text question from Stop: type the answer into the agent's WezTerm pane. */
+/** Free-text question from Stop: type the answer into the agent's terminal session. */
 async function answerInTerminal(card: Card, text: unknown): Promise<boolean> {
   const session = sessions.get(card.req.agentId)
-  if (typeof text !== 'string' || !text.trim() || !session?.pane) return false
+  if (typeof text !== 'string' || !text.trim() || !session?.terminal) return false
   try {
     await sendText(session, text.trim())
   } catch (err) {
-    console.error('wezterm send-text failed:', err)
+    console.error('terminal send-text failed:', err)
     return false
   }
   if (cards.includes(card)) remove([card])
@@ -126,15 +138,15 @@ function answerFor(q: HookInput, reply: QuestionAnswer | undefined): string | un
   return labels.join(', ')
 }
 
-/** "Ir para o terminal": focus and highlight the agent's WezTerm pane. */
+/** "Ir para o terminal": focus and highlight the agent's terminal session. */
 export async function focusAgent(agentId: string): Promise<boolean> {
   const session = sessions.get(agentId)
-  if (!session?.pane) return false
+  if (!session?.terminal) return false
   try {
     await focus(session, session.name)
     return true
   } catch (err) {
-    console.error('wezterm focus failed:', err)
+    console.error('terminal focus failed:', err)
     return false
   }
 }
@@ -261,6 +273,7 @@ function touch(sid: string, input: HookInput, req: IncomingMessage): Session {
   const cwd = typeof input.cwd === 'string' ? input.cwd : ''
   const name = header(req, 'x-agent-name') || posix.basename(cwd) || 'agente'
   const pane = header(req, 'x-wezterm-pane')
+  const iterm = header(req, 'x-iterm-session')
   const session: Session = {
     id: sid,
     name,
@@ -269,7 +282,9 @@ function touch(sid: string, input: HookInput, req: IncomingMessage): Session {
     working: false,
     socket: header(req, 'x-wezterm-socket'),
     distro: header(req, 'x-wsl-distro'),
-    ...(pane && { pane })
+    // iTerm2 has no locator worth showing; the pill alone says we can drive it.
+    ...(pane ? { pane, terminal: { app: 'WezTerm', label: `painel ${pane}` } }
+      : iterm ? { iterm, terminal: { app: 'iTerm2', label: '' } } : {})
   }
   sessions.set(sid, session)
   updateBranch(session, cwd)
@@ -286,7 +301,7 @@ function pickColor(name: string): string {
 }
 
 function updateBranch(session: Session, cwd: unknown): void {
-  if (!session.distro || typeof cwd !== 'string' || !cwd.startsWith('/')) return
+  if (typeof cwd !== 'string' || !cwd.startsWith('/')) return
   readBranch(session.distro, cwd).then((branch) => {
     if (branch !== session.branch && sessions.get(session.id) === session) {
       session.branch = branch
@@ -295,12 +310,13 @@ function updateBranch(session: Session, cwd: unknown): void {
   })
 }
 
-/** Reads .git/HEAD walking up from cwd, through the WSL share. */
+/** Reads .git/HEAD walking up from cwd: through the WSL share when the hook ran in WSL, locally otherwise. */
 async function readBranch(distro: string, cwd: string): Promise<string> {
   for (let dir = cwd; ; dir = posix.dirname(dir)) {
     const winDir = dir === '/' ? '' : dir.replaceAll('/', '\\')
+    const path = distro ? `\\\\wsl.localhost\\${distro}${winDir}\\.git\\HEAD` : posix.join(dir, '.git', 'HEAD')
     try {
-      const head = (await readFile(`\\\\wsl.localhost\\${distro}${winDir}\\.git\\HEAD`, 'utf8')).trim()
+      const head = (await readFile(path, 'utf8')).trim()
       const ref = /^ref: refs\/heads\/(.+)$/.exec(head)
       return ref ? ref[1] : head.slice(0, 7)
     } catch {

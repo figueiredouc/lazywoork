@@ -61,9 +61,18 @@ Claude Code 2.1.293, sessão interativa em tmux no WSL, hooks `type: "http"` par
 
 | # | Pressuposto | Estado |
 |---|---|---|
-| T1 | Uma interface comum (identificar sessão, focar, destacar, enviar texto) cobre WezTerm, iTerm2 e tmux; cada capacidade pode faltar (modo reduzido). | por confirmar |
+| T1 | Uma interface comum (identificar sessão, focar, destacar, enviar texto) cobre WezTerm, iTerm2 e tmux; cada capacidade pode faltar (modo reduzido). | **confirmado** (2026-10-11): `terminal.ts` com `focus`/`clearHighlight`/`sendText` serve os dois adaptadores sem alterar o núcleo; a escolha é pelo cabeçalho recebido, não pela plataforma |
 | T2 | Num terminal sem adaptador, dá para pelo menos trazer a app do terminal para a frente (ex: via `TERM_PROGRAM`). | por confirmar |
-| T3 | iTerm2 (depois da v1): `ITERM_SESSION_ID` + AppleScript permitem focar, destacar e escrever texto numa sessão. | por confirmar |
+| T3 | iTerm2 (depois da v1): `ITERM_SESSION_ID` + AppleScript permitem focar, destacar e escrever texto numa sessão. | **confirmado** (spike 2026-10-11): `ITERM_SESSION_ID` é `w0t2p0:<uuid>` e o `<uuid>` é o `id` da sessão em AppleScript; percorrer `windows` → `tabs of w` → `sessions of t` e comparar `id of s` encontra-a; `select w`/`select t`/`select s` + `set name of s to "aqui! · x"` funcionam e `set name of s to ""` repõe o título; `select` sozinho **não** levanta a app (é preciso `activate`); `write text "…"` compila contra o dicionário do iTerm2 |
+
+## macOS + iTerm2
+
+| # | Pressuposto | Estado |
+|---|---|---|
+| M1 | O título `aqui! · nome` sobrevive aos escapes de título que o próprio Claude Code escreve (não é logo substituído). | por confirmar |
+| M2 | O Electron precisa da permissão de Automação do macOS para o iTerm; o pedido aparece no primeiro "Ir para o terminal" e, uma vez dado, não volta. | por confirmar |
+| M3 | `write text` entra no TUI do Claude Code como texto normal e submete (sem colar nem partir linhas). | por confirmar |
+| M4 | `showInactive()` + `type: 'panel'` + `setVisibleOnAllWorkspaces` nunca roubam o foco do teclado no macOS, e a janela fica por cima em todos os Spaces (incl. ecrã inteiro). | por confirmar |
 
 ## App
 
@@ -90,4 +99,4 @@ Fonte: docs Electron (`BrowserWindow`, "Custom window styles"), lidas a 2026-10-
 
 ## Fora do âmbito da v1
 
-Adaptadores para iTerm2, Terminal.app, VS Code, tmux e Windows Terminal. A integração com o terminal fica atrás de uma interface para não os impedir.
+Adaptadores para Terminal.app, VS Code, tmux e Windows Terminal (o de iTerm2 entrou em 2026-10-11). A integração com o terminal fica atrás de uma interface para não os impedir.

@@ -9,6 +9,7 @@ const ICONS = {
   chevronRight: <path d="M9 6l6 6-6 6" />,
   terminal: <><path d="M4 17l6-5-6-5" /><path d="M12 19h8" /></>,
   check: <path d="M5 12l5 5 9-10" />,
+  pencil: <><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="M13 7l4 4" /></>,
   warning: <><path d="M12 3l10 18H2z" /><path d="M12 10v5" /><path d="M12 18v.5" /></>
 }
 
@@ -100,5 +101,37 @@ export function MessageBox({ label, hint, onSend, extra }: MessageBoxProps) {
       </div>
       <div className="hint">{hint}</div>
     </div>
+  )
+}
+
+const MAX_NAME = 40
+
+/** Agent name, click to rename (session-only). Enter/blur saves, Esc cancels, empty keeps the old name. */
+export function AgentName({ agent }: { agent: Agent }) {
+  const [editing, setEditing] = useState(false)
+  if (!editing) {
+    return (
+      <button className="agent-name" title="Mudar o nome" onClick={() => setEditing(true)}>
+        <h2 className="title">{agent.name}</h2>
+        <span className="agent-name-pencil"><Icon name="pencil" size={14} /></span>
+      </button>
+    )
+  }
+  const save = (value: string) => {
+    const name = value.replace(/\s+/g, ' ').trim()
+    if (name && name !== agent.name) window.inbox.rename(agent.id, name)
+    setEditing(false)
+  }
+  return (
+    <input className="field agent-name-input" aria-label="Nome do agente" defaultValue={agent.name}
+      maxLength={MAX_NAME} autoFocus onFocus={(e) => e.target.select()}
+      onBlur={(e) => save(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') e.currentTarget.blur()
+        if (e.key === 'Escape') {
+          e.currentTarget.value = agent.name
+          setEditing(false)
+        }
+      }} />
   )
 }

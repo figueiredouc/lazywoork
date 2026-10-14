@@ -10,19 +10,22 @@ WSL                                   Windows
 │ claude (sessão N)    │  localhost  │ Agent Inbox (Electron)                │
 │  hooks (curl) ───────┼────────────►│  main: servidor HTTP 127.0.0.1:41823  │
 │  headers: pane,      │◄────────────┼─  inbox (estado dos pedidos)          │
-│  socket, nome        │  decisão    │  wezterm.ts (wezterm.exe cli + foco)  │
+│  socket, nome        │  decisão    │  terminal.ts (wezterm.ts / iterm.ts)  │
 └──────────────────────┘             │  renderer: UI do dummy (React)        │
                                      └───────────────────────────────────────┘
 ```
 
+No macOS é o mesmo desenho sem a fronteira: Claude Code, iTerm2 e a app na mesma máquina.
+
 Sem scripts de hook: cada hook é um `curl` que faz o POST, e a app responde.
 App fechada → ligação recusada → `|| true` → o Claude Code segue como hoje.
 
-## Hooks (`~/.claude/settings.json` no WSL)
+## Hooks (`~/.claude/settings.json`, no WSL ou no Mac)
 
 Todos `type: "command"`: um `curl` que envia o stdin (JSON do hook) por POST para `http://127.0.0.1:41823/hook`,
 com cabeçalhos `X-Wezterm-Pane: $WEZTERM_PANE`, `X-Wezterm-Socket: $WEZTERM_UNIX_SOCKET`,
-`X-Agent-Name: $AGENT_INBOX_NAME`, `X-Wsl-Distro: $WSL_DISTRO_NAME`, e `|| true` no fim.
+`X-Iterm-Session: $ITERM_SESSION_ID`, `X-Agent-Name: $AGENT_INBOX_NAME`, `X-Wsl-Distro: $WSL_DISTRO_NAME`, e `|| true` no fim.
+Um só conjunto de cabeçalhos para as duas plataformas: variável não definida → cabeçalho vazio → a app trata-o como ausente.
 
 - `PermissionRequest`: `--max-time 600`; o stdout do `curl` (decisão JSON da app, ou vazio) é a saída do hook.
 - Restantes: `--max-time 2 -o /dev/null` (não há decisão).
@@ -61,26 +64,39 @@ Não usar `PreToolUse` (bloqueia o terminal) nem `Notification` (chega ~6 s depo
 | Ou diz-lhe outra coisa | `{behavior: "deny", message: "The user denied this from Agent Inbox and replied: \"<texto>\""}` |
 | Opção A/B de uma pergunta | `{behavior: "allow", updatedInput: {...tool_input, answers: {"<pergunta>": "<label>"}}}` |
 | Ou responde à tua maneira (pergunta com opções) | igual, com o texto em vez do label |
-| Enviar (pergunta em texto livre, vinda do `Stop`) | `wezterm cli send-text` na sessão do agente |
+| Enviar (pergunta em texto livre, vinda do `Stop`) | `sendText` no adaptador do terminal do agente |
 
 Comandos destrutivos: a lista de padrões filtra as opções "não voltar a perguntar" e exige confirmação (já feito no dummy).
 
 ## Identidade do agente
 
 - Sessão = `session_id`. Nome = `X-Agent-Name` ou o nome da pasta de `cwd`.
-- Branch: a app lê `.git/HEAD` em `\\wsl.localhost\Ubuntu<cwd>` (procura para cima).
+- Branch: a app lê `.git/HEAD` a procurar para cima a partir de `cwd` — em `\\wsl.localhost\<distro><cwd>` quando há `X-Wsl-Distro`, no caminho local (macOS) quando não há.
 - Cor: hash do nome → uma das 4 cores de avatar.
-- Separador: `X-Wezterm-Pane`; sem ele → modo reduzido.
+- Terminal: `X-Wezterm-Pane` ou `X-Iterm-Session`; sem nenhum → modo reduzido. O `Agent` só leva `terminal: { app, label }` (nome a mostrar + localizador curto, vazio no iTerm2); o id da sessão fica no main.
 
-## WezTerm (`src/main/wezterm.ts`)
+## Terminais (`src/main/terminal.ts` + adaptadores)
 
-Quatro funções, sem interface abstrata (só há um terminal na v1):
+Interface comum, três funções: `focus(target, nome)`, `clearHighlight(target)`, `sendText(target, texto)`.
+O `target` é `{ pane, socket, iterm }`; o router escolhe o adaptador pelo **cabeçalho que chegou** (não pelo `process.platform`),
+para que o mesmo binário sirva as duas plataformas. Destaque de 5 s nos dois, reposto por `clearHighlight`.
 
-- `focus(pane, socket)`: `wezterm cli activate-pane` + `AppActivate(<pid>)` (pid tirado de `gui-sock-<pid>`), chamado no clique.
-- `highlight(pane, nome)` / `clearHighlight(pane)`: `set-tab-title "aqui! · nome"` / `""`; o resto está no `.wezterm.lua`.
-- `sendText(pane, texto)`: `send-text --no-paste` + `\n`.
+**WezTerm (`wezterm.ts`, Windows):**
 
-Sem pane → `focus` só traz o WezTerm para a frente; `sendText` indisponível (botão escondido).
+- `focus`: `wezterm cli activate-pane` + `AppActivate(<pid>)` (pid tirado de `gui-sock-<pid>`).
+- destaque: `set-tab-title "aqui! · nome"` / `""`; o resto está no `.wezterm.lua`.
+- `sendText`: `send-text --no-paste` + `\r`.
+
+**iTerm2 (`iterm.ts`, macOS):** um `osascript` por operação, com o script em stdin (`osascript -`, nunca `-e`: evita aspas em argv)
+e as strings interpoladas escapadas (`\` e `"`). O id da sessão é o que vem depois do primeiro `:` em `ITERM_SESSION_ID`
+(`w0t2p0:<uuid>` → `<uuid>`); o script percorre `windows` → `tabs` → `sessions` à procura do `id of s`, e falha se não existir
+(a app devolve `false` e a UI mostra o aviso).
+
+- `focus`: `activate` + `select w` / `select t` / `select s` + `set name of s to "aqui! · nome"` (`select` sozinho não levanta a app).
+- destaque: `set name of s to ""` repõe o título controlado pelo programa.
+- `sendText`: `write text "<texto>"` — a newline implícita submete.
+
+Sem terminal conhecido → modo reduzido: `focus` e `sendText` indisponíveis (botão escondido, avisos na app).
 
 ## Renderer
 

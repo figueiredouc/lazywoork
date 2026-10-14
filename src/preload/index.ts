@@ -8,6 +8,7 @@ const api = {
   setPinned: (pinned: boolean) => ipcRenderer.send('set-pinned', pinned),
   getState: (): Promise<InboxState> => ipcRenderer.invoke('inbox:get'),
   dismiss: (id: string) => ipcRenderer.send('inbox:dismiss', id),
+  rename: (agentId: string, name: string) => ipcRenderer.send('inbox:rename', agentId, name),
   focus: (agentId: string): Promise<boolean> => ipcRenderer.invoke('inbox:focus', agentId),
   answer: (id: string, reply: Reply): Promise<boolean> =>
     ipcRenderer.invoke('inbox:answer', id, reply),

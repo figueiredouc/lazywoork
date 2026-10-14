@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { Avatar, CommandBox, Icon, MessageBox, OptionButton, Tag } from './components'
+import { AgentName, Avatar, CommandBox, Icon, MessageBox, OptionButton, Tag } from './components'
 import {
   elapsed,
   findDestructive,
@@ -186,7 +186,7 @@ function QuestionCardBody({ req, agent, actions }: { req: QuestionRequest; agent
 /** Only hook questions can be answered from the app for now; the rest get the "not yet" toast. */
 function replyInTerminal(req: QuestionRequest, agent: Agent, actions: Actions, text: string) {
   actions.decide(req, { text }, `Resposta escrita na sessão de ${agent.name}`,
-    agent.pane ? 'Não consegui escrever no WezTerm.' : 'Este agente não está no WezTerm: responde no terminal.')
+    agent.terminal ? `Não consegui escrever no ${agent.terminal.app}.` : 'Este agente não está num terminal que eu saiba controlar: responde no terminal.')
 }
 
 // ---------- Screens 3–5: detail ----------
@@ -214,8 +214,8 @@ export function DetailView({ req, position, total, onBack, ...ctx }: DetailProps
         <div className="row gap-12">
           <Avatar agent={a} large />
           <div className="grow stack-tight">
-            <h2 className="title">{a.name}</h2>
-            <div className="mono-meta">{meta(a.branch, a.pane && `painel ${a.pane}`, elapsed(req.createdAt, ctx.now))}</div>
+            <AgentName key={a.id} agent={a} />
+            <div className="mono-meta">{meta(a.branch, a.terminal?.label, elapsed(req.createdAt, ctx.now))}</div>
           </div>
         </div>
         {req.kind === 'permission'
@@ -302,9 +302,9 @@ function QuestionDetail({ req, agent, actions }: { req: QuestionRequest; agent: 
           onSend={(text) => actions.decide(req, { text }, `Resposta enviada a ${agent.name}`)}
           extra={terminalButton} />
       )}
-      {/* Free-text question from Stop: typed into the agent's WezTerm pane, if we know it. */}
-      {req.replyVia === 'terminal' && (agent.pane ? (
-        <MessageBox label="Ou responde à tua maneira" hint="A resposta é escrita na sessão do agente no WezTerm."
+      {/* Free-text question from Stop: typed into the agent's terminal session, if we know it. */}
+      {req.replyVia === 'terminal' && (agent.terminal ? (
+        <MessageBox label="Ou responde à tua maneira" hint={`A resposta é escrita na sessão do agente no ${agent.terminal.app}.`}
           onSend={(text) => replyInTerminal(req, agent, actions, text)}
           extra={terminalButton} />
       ) : (

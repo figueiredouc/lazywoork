@@ -100,9 +100,9 @@ export function App() {
     },
     open: setOpenId,
     goToTerminal: (req) => {
-      const hasPane = Boolean(agentById(req.agentId).pane)
+      const { terminal } = agentById(req.agentId)
       window.inbox.focus(req.agentId).then((ok) => {
-        if (!ok) return setToast(hasPane ? 'Não consegui mostrar o terminal.' : 'Este agente não está no WezTerm.')
+        if (!ok) return setToast(terminal ? 'Não consegui mostrar o terminal.' : 'Este agente não está num terminal que eu saiba controlar.')
         setOpenId(null)
         setShowing(req.id)
       })

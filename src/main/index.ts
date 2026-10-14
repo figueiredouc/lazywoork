@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, screen } from 'electron'
 import { join } from 'node:path'
-import { answer, dismiss, focusAgent, getState, PORT, startInbox, type Reply } from './inbox'
+import { answer, dismiss, focusAgent, getState, PORT, rename, startInbox, type Reply } from './inbox'
 
 // Panel is 380px wide; the window adds 4px on the right/bottom for the solid CSS shadow.
 const WIDTH = 384
@@ -8,6 +8,8 @@ const HEIGHT = { compact: 154, expanded: 724 }
 const MARGIN = 16
 /** Expanded window fits its content between these; HEIGHT.expanded is the cap. */
 const MIN_EXPANDED = 200
+
+const MAC = process.platform === 'darwin'
 
 let win: BrowserWindow | null = null
 let mode: keyof typeof HEIGHT = 'compact'
@@ -29,9 +31,12 @@ function createWindow(): void {
     fullscreenable: false,
     alwaysOnTop: true,
     show: false,
+    ...(MAC && { type: 'panel' }),
     webPreferences: { preload: join(__dirname, '../preload/index.js'), sandbox: true }
   })
   win.setAlwaysOnTop(true, 'floating')
+  // macOS only: stay visible on every space, including over fullscreen apps.
+  if (MAC) win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   // Never steal keyboard focus: show without activating.
   win.once('ready-to-show', () => win?.showInactive())
   win.on('focus', () => win?.flashFrame(false))
@@ -58,6 +63,7 @@ ipcMain.on('set-pinned', (_e, pinned: boolean) => win?.setAlwaysOnTop(pinned, 'f
 
 ipcMain.handle('inbox:get', () => getState())
 ipcMain.on('inbox:dismiss', (_e, id: string) => dismiss(id))
+ipcMain.on('inbox:rename', (_e, agentId: string, name: string) => rename(agentId, name))
 ipcMain.handle('inbox:focus', (_e, agentId: string) => focusAgent(agentId))
 ipcMain.handle('inbox:answer', (_e, id: string, reply: Reply) => answer(id, reply ?? {}))
 

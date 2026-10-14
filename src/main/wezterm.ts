@@ -1,11 +1,10 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+import type { Target } from './terminal'
 
 const run = promisify(execFile)
 // ponytail: fixed default install path; make it configurable if anyone installs WezTerm elsewhere.
 const WEZTERM = 'C:\\Program Files\\WezTerm\\wezterm.exe'
-
-export type Target = { pane?: string; socket?: string }
 
 const HIGHLIGHT_MS = 5000
 const highlights = new Map<string, NodeJS.Timeout>()

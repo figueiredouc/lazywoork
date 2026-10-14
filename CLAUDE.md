@@ -18,9 +18,9 @@ App desktop (Electron) com uma janela pequena, flutuante e sempre por cima (esti
 - **Duas camadas:**
   - **Núcleo** (independente do terminal): hooks, cartões, respostas a permissões, concluídos.
   - **Adaptadores de terminal** (um por terminal, atrás de uma interface comum): focar janela/separador, destacar, escrever texto na sessão.
-- **Plataforma da v1: Windows.** App Electron e WezTerm correm no Windows; Claude Code (e os hooks) correm no WSL. macOS fica para depois; não usar nada que o impeça.
-- **Terminal da v1: WezTerm** (`wezterm cli`, `WEZTERM_PANE`). Sem adaptador → modo reduzido (ver `docs/product.md`).
-- Depois da v1: adaptador iTerm2; mais tarde tmux / Windows Terminal se fizer falta.
+- **Plataformas: Windows e macOS.** No Windows, a app Electron e o WezTerm correm no Windows e o Claude Code (e os hooks) no WSL. No macOS corre tudo na mesma máquina.
+- **Terminais: WezTerm** (`wezterm cli`, `WEZTERM_PANE`) **e iTerm2** (`osascript`, `ITERM_SESSION_ID`), atrás da mesma interface (`src/main/terminal.ts`). Sem adaptador → modo reduzido (ver `docs/product.md`).
+- Mais tarde, se fizer falta: tmux, Windows Terminal.
 
 ## Correr (Windows)
 
@@ -34,6 +34,21 @@ npm run typecheck
 ```
 
 A partir do WSL (sem pedidos de permissão): `bash scripts/npm-win run dev` / `bash scripts/npm-win run typecheck`. Não usar `cmd.exe`/`powershell.exe` para isto: pedem sempre permissão.
+
+## Correr (macOS)
+
+Tudo na mesma máquina, sem truques:
+
+```
+npm install
+node node_modules/electron/install.js   # só na 1.ª vez: descarrega o binário do Electron
+npm run dev
+npm run typecheck
+```
+
+Se a pasta vier de uma instalação feita noutro sistema, apaga o `node_modules` antes do `npm install`: os binários nativos são por plataforma.
+
+Na primeira vez que carregares em "Ir para o terminal", o macOS pede permissão de Automação para o iTerm (Definições → Privacidade e Segurança → Automação). Enquanto não a deres, o botão falha e a app mostra o aviso.
 
 ## Como trabalhar comigo
 

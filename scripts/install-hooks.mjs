@@ -1,4 +1,4 @@
-// Merges the Agent Inbox hooks into ~/.claude/settings.json (run with WSL node).
+// Merges the Agent Inbox hooks into ~/.claude/settings.json (run where Claude Code runs: WSL node, or macOS node).
 // Default: dry run. --apply: write (with backup). --remove: remove our hooks (with backup).
 // Command hooks with curl, not http hooks: with the app closed they must fail silently (|| true).
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -9,6 +9,7 @@ const URL = 'http://127.0.0.1:41823/hook'
 const HEADERS = {
   'X-Wezterm-Pane': 'WEZTERM_PANE',
   'X-Wezterm-Socket': 'WEZTERM_UNIX_SOCKET',
+  'X-Iterm-Session': 'ITERM_SESSION_ID',
   'X-Agent-Name': 'AGENT_INBOX_NAME',
   'X-Wsl-Distro': 'WSL_DISTRO_NAME'
 }

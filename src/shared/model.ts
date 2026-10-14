@@ -3,8 +3,8 @@ export type Agent = {
   name: string
   branch: string
   color: string
-  /** WezTerm pane id; absent = reduced mode. */
-  pane?: string
+  /** Terminal we can drive; absent = reduced mode. `label` is a short locator, may be empty. */
+  terminal?: { app: string; label: string }
   working: boolean
 }
 

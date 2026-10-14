@@ -38,6 +38,7 @@ Cada passo é implementado por um agente de código, a partir de um briefing meu
 | 4 | **"Ir para o terminal"** com destaque no WezTerm. | ✅ testado (2026-10-07) |
 | 5 | **Perguntas em texto livre** (`Stop` a acabar em "?") e "Enviar" escrito no WezTerm. | ✅ testado (2026-10-07) |
 | 6 | **Polimento:** instalador final (hooks + `.wezterm.lua`), arranque, casos-limite. | |
+| 7 | **macOS + iTerm2:** adaptadores atrás de uma interface comum (`terminal.ts`); focar/destacar/escrever por AppleScript; janela `panel` em todos os Spaces. | ⏳ por testar |
 
 ## Passo 4: testes por fase
 
@@ -45,5 +46,4 @@ No fim de cada fase: instruções exatas de como testar, ligadas aos critérios 
 
 ## Depois da v1
 
-- Adaptador iTerm2.
-- Mais tarde, se fizer falta: tmux, Windows Terminal.
+- Se fizer falta: tmux, Windows Terminal, Terminal.app.
