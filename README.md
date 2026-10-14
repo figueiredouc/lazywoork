@@ -4,130 +4,135 @@
 
 # Agent Inbox
 
-**A caixa de entrada dos teus agentes.** Uma janela pequena, flutuante e sempre por cima que mostra um cartão por cada sessão do Claude Code que está à tua espera — permissões, perguntas e trabalhos terminados. Respondes ali mesmo, sem andar à procura do separador certo.
+**An inbox for your agents.** A small floating window, always on top, with one card per Claude Code session that is waiting on you — permissions, questions and finished work. You answer right there, instead of hunting for the right terminal tab.
 
-`macOS` · `Windows + WSL` · Electron + React · tudo local
+`macOS` · `Windows + WSL` · Electron + React · everything local
 
-<img src="docs/screenshots/2-lista.png" width="340" alt="Lista de pedidos" />
+<img src="docs/screenshots/2-lista.png" width="340" alt="List of pending requests" />
 
 </div>
 
+> The app's interface is in European Portuguese, as are the docs under [`docs/`](docs/). This README is the English guide to it.
+
 ---
 
-## O problema
+## The problem
 
-Com 3 a 5 sessões do Claude Code em paralelo, os agentes passam metade do tempo parados: um quer correr um comando, outro fez uma pergunta, outro acabou há cinco minutos e ninguém deu por isso. A informação está toda lá — num separador de terminal que não estás a ver.
+With three to five Claude Code sessions running in parallel, the agents spend half their time idle: one wants to run a command, another asked a question, another finished five minutes ago and nobody noticed. The information is all there — in a terminal tab you are not looking at.
 
-O Agent Inbox junta esses pedidos num sítio só.
+Agent Inbox puts those requests in one place.
 
-## O que faz
+## What it does
 
-- **Um cartão por pedido.** Permissões, perguntas e "terminou", de todas as sessões, com o nome do agente, a branch e há quanto tempo espera.
-- **Respondes na app.** Os botões são as opções reais daquele pedido — nunca uma lista fixa. Ou escreves uma mensagem e o agente segue por aí.
-- **Salta para o terminal.** Um clique traz a janela do terminal para a frente, no separador certo, com destaque.
-- **Nunca te atrapalha.** Não rouba o foco do teclado, e com a app fechada o Claude Code comporta-se exatamente como hoje.
+- **One card per request.** Permissions, questions and "done", from every session, with the agent's name, its branch and how long it has been waiting.
+- **You answer in the app.** The buttons are that request's real options — never a fixed list. Or you type a message and the agent follows it instead.
+- **Jump to the terminal.** One click brings the terminal window to the front, on the right tab, highlighted.
+- **It never gets in the way.** It doesn't steal keyboard focus, and with the app closed Claude Code behaves exactly as it does today.
 
-## Os ecrãs
+## The screens
 
 <table>
 <tr>
 <td align="center" width="33%">
-<img src="docs/screenshots/1-compacto.png" alt="Sem pedidos" /><br />
-<b>Tudo tranquilo</b><br />
-Modo compacto: uma pílula por agente ligado, ponto cheio = a trabalhar.
+<img src="docs/screenshots/1-compacto.png" alt="Nothing pending" /><br />
+<b>All quiet</b><br />
+Compact mode: one pill per connected agent, filled dot = working.
 </td>
 <td align="center" width="33%">
-<img src="docs/screenshots/3-permissao.png" width="250" alt="Detalhe de permissão" /><br />
-<b>Permissão</b><br />
-O comando completo, o porquê, e um botão por cada opção que o pedido oferece.
+<img src="docs/screenshots/3-permissao.png" width="250" alt="Permission detail" /><br />
+<b>Permission</b><br />
+The full command, the reason, and one button per option the request offers.
 </td>
 <td align="center" width="33%">
-<img src="docs/screenshots/5-pergunta.png" width="250" alt="Detalhe de pergunta" /><br />
-<b>Pergunta</b><br />
-Opções A/B quando existem; senão, só a caixa de resposta, escrita na sessão certa.
+<img src="docs/screenshots/5-pergunta.png" width="250" alt="Question detail" /><br />
+<b>Question</b><br />
+A/B options when the request has them; otherwise just the reply box, typed into the right session.
 </td>
 </tr>
 </table>
 
-### Comandos destrutivos
+### Destructive commands
 
 <div align="center">
-<img src="docs/screenshots/4-destrutivo.png" width="300" alt="Comando destrutivo" />
+<img src="docs/screenshots/4-destrutivo.png" width="300" alt="Destructive command" />
 </div>
 
-Padrões como `rm -rf`, `git reset --hard` ou `DROP TABLE` ficam realçados dentro do comando, o "Sim" só desbloqueia depois de confirmares, o "Não" é a opção em destaque — e **nunca** há "não voltar a perguntar".
+Patterns such as `rm -rf`, `git reset --hard` or `DROP TABLE` are highlighted inside the command, "Yes" stays disabled until you tick the confirmation, "No" is the prominent option — and there is **never** a "don't ask again".
 
-## Como funciona
+## How it works
 
-Os hooks do Claude Code fazem um `curl` para a app, em localhost. Nada sai da máquina.
+Claude Code's hooks `curl` into the app over localhost. Nothing leaves the machine.
 
 ```
-Claude Code (sessão N)            Agent Inbox (Electron)
+Claude Code (session N)           Agent Inbox (Electron)
   hooks (curl) ──── POST ───────► 127.0.0.1:41823/hook
-               ◄─── decisão ────  cartão respondido na app
+               ◄─── decision ───  card answered in the app
 ```
 
-No `PermissionRequest` a app segura a ligação até haver resposta — na app ou no terminal, o que vier primeiro. Se responderes no terminal, o cartão desaparece sozinho. Se a app estiver fechada, o `curl` falha com `|| true` e o diálogo normal aparece no terminal, como sempre.
+On `PermissionRequest` the app holds the connection open until there is an answer — in the app or in the terminal, whichever comes first. Answer in the terminal and the card disappears on its own. With the app closed, `curl` fails, `|| true` swallows it, and the usual prompt shows up in the terminal as always.
 
-Detalhes em [`docs/architecture.md`](docs/architecture.md).
+Details in [`docs/architecture.md`](docs/architecture.md) (Portuguese).
 
-## Instalar (macOS)
+## Install (macOS)
 
 ```bash
 npm install
-node node_modules/electron/install.js   # só na 1.ª vez: descarrega o binário do Electron
-npm run dist:mac                        # gera release/Agent Inbox-<versão>-arm64.dmg
+node node_modules/electron/install.js   # first time only: downloads the Electron binary
+npm run dist:mac                        # builds release/Agent Inbox-<version>-arm64.dmg
 ```
 
-Abre o `.dmg`, arrasta a app para as Aplicações e regista os hooks na sessão onde corre o Claude Code:
+Open the `.dmg`, drag the app into Applications, then register the hooks wherever Claude Code runs:
 
 ```bash
-node scripts/install-hooks.mjs          # mostra o que vai mudar
-node scripts/install-hooks.mjs --apply  # escreve em ~/.claude/settings.json (com backup)
+node scripts/install-hooks.mjs          # shows what would change
+node scripts/install-hooks.mjs --apply  # writes ~/.claude/settings.json (with a backup)
 ```
 
-Na primeira vez que carregares em "Ir para o terminal", o macOS pede permissão de Automação para o iTerm2 (Definições → Privacidade e Segurança → Automação).
+The first time you hit "go to the terminal", macOS asks for Automation permission for iTerm2 (Settings → Privacy & Security → Automation).
 
-A app não está assinada com uma conta de programador: na primeira abertura usa botão direito → Abrir.
+The app is not signed with a developer account: on first launch use right-click → Open.
 
 ### Windows + WSL
 
-A app e o WezTerm correm no Windows, o Claude Code e os hooks no WSL. Instruções em [`CLAUDE.md`](CLAUDE.md).
+The app and WezTerm run on Windows, Claude Code and the hooks run in WSL. Instructions in [`CLAUDE.md`](CLAUDE.md).
 
-## Desenvolvimento
+## Development
 
 ```bash
-npm run dev        # app com hot reload
+npm run dev          # app with hot reload
 npm run typecheck
+npm run screenshots  # rebuilds the images in docs/screenshots
 ```
 
-## Terminais
+## Terminals
 
-| Terminal | Estado |
+| Terminal | Status |
 |---|---|
-| WezTerm (`wezterm cli`) | suporte completo: focar, destacar o separador, escrever na sessão |
-| iTerm2 (AppleScript) | suporte completo |
-| Outros | modo reduzido: cartões e respostas a permissões funcionam; sem saltar para o separador |
+| WezTerm (`wezterm cli`) | full support: focus, highlight the tab, type into the session |
+| iTerm2 (AppleScript) | full support |
+| Others | reduced mode: cards and permission answers work; no jumping to the tab |
 
-## Princípios
+## Principles
 
-1. **Nunca bloquear.** App fechada, com erro ou sem resposta dentro do tempo → o hook sai e o Claude Code segue como hoje.
-2. **Tudo local.** Hooks ↔ app só por HTTP em localhost.
-3. **Nunca roubar o foco do teclado.** Um cartão novo chama a atenção, não te tira do sítio.
-4. **Opções dinâmicas.** Os botões vêm das opções reais de cada pedido.
-5. **Comandos destrutivos** exigem confirmação explícita e nunca oferecem "não voltar a perguntar".
-6. **Sem duplicados.** Um cartão por pedido; responder no terminal remove-o; o fim da sessão limpa os dela.
+1. **Never block.** App closed, erroring or not answered in time → the hook exits and Claude Code carries on as today.
+2. **Everything local.** Hooks ↔ app talk over HTTP on localhost only.
+3. **Never steal keyboard focus.** A new card draws attention without moving you.
+4. **Dynamic options.** The buttons come from each request's real options.
+5. **Destructive commands** need an explicit confirmation and never offer "don't ask again".
+6. **No duplicates.** One card per request; answering in the terminal clears it; ending a session clears its cards.
 
 ## Docs
 
-| Ficheiro | O que tem |
-|---|---|
-| [`docs/product.md`](docs/product.md) | Ideia, ecrãs, regras de comportamento, critérios de aceitação |
-| [`docs/design.md`](docs/design.md) | Estilo "Limão": tokens, componentes, tom |
-| [`docs/architecture.md`](docs/architecture.md) | Hooks, ciclo de um pedido, adaptadores de terminal |
-| [`docs/technical-notes.md`](docs/technical-notes.md) | Pressupostos técnicos e o seu estado |
-| [`docs/roadmap.md`](docs/roadmap.md) | Plano de trabalho e fases |
+All in European Portuguese.
 
-## Licença
+| File | What's in it |
+|---|---|
+| [`docs/product.md`](docs/product.md) | Idea, screens, behaviour rules, acceptance criteria |
+| [`docs/design.md`](docs/design.md) | The "Limão" style: tokens, components, tone |
+| [`docs/architecture.md`](docs/architecture.md) | Hooks, lifecycle of a request, terminal adapters |
+| [`docs/technical-notes.md`](docs/technical-notes.md) | Technical assumptions and their status |
+| [`docs/roadmap.md`](docs/roadmap.md) | Plan and phases |
+
+## License
 
 [Apache 2.0](LICENSE).
